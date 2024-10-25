@@ -2,6 +2,7 @@ package com.example.android_snack;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+//它使用了 Android 的 SharedPreferences 机制来保存用户的最高游戏分数
 
 /**
  * The type Shared pre：分数存储处理
