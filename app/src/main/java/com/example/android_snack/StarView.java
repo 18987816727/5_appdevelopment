@@ -4,12 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,70 +31,35 @@ public class StarView extends AppCompatActivity implements View.OnClickListener 
      * The Shared：实例化存储对象
      */
     SharedPre shared;
-    private static final String SHARED_PREF_NAME = "user_records";// 记录条数
-    private static final String RECORD_COUNT_KEY = "record_count";
-    private static final String RECORD_PREFIX = "record_";
-
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 99;
-    private AMapLocationClient locationClient;
-    private AMapLocationClientOption locationOption;
-    private DBHelper dbHelper;
-
-//    纬度
-    private double latitude;
-//    经度
-    private double longitude;
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (dbHelper!=null){
-            dbHelper.close();
-            dbHelper=null;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        deleteDatabase("locationDatabase.db");
         setContentView(R.layout.activity_star_view);
-        InitPositionTools();
+        try {
+            InitPositionTools();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         Init();
-        addRecord();
+
     }
 
-    void InitPositionTools(){
-//        过设置隐私同意
+    void InitPositionTools() throws InterruptedException {
+
         AMapLocationClient.updatePrivacyAgree(this,true);
         AMapLocationClient.updatePrivacyShow(this,true,true);
 
-        // 初始化定位客户端
-
-        try {
-            locationClient = new AMapLocationClient(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-        locationOption = new AMapLocationClientOption();
-        locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        locationOption.setNeedAddress(true);
-        locationClient.setLocationOption(locationOption);
-
-        AMapLocation lastKnownLocation = locationClient.getLastKnownLocation();
-        latitude=lastKnownLocation.getLatitude();
-        longitude=lastKnownLocation.getLongitude();
+        // 启动定位服务
+        Intent intent = new Intent(this, LocationService.class);
+        startService(intent);
     }
 
     /**
      * Init：初始化该活动界面信息
      */
     void Init(){
-        if (dbHelper==null){
-            dbHelper=new DBHelper(this);
-        }
         Starbutton=findViewById(R.id.star_game);
         Sbutton=findViewById(R.id.MostBUtton);
         Backbutton=findViewById(R.id.BackButton);
@@ -118,47 +85,6 @@ public class StarView extends AppCompatActivity implements View.OnClickListener 
             3. convertToHeavenlyStemEarthlyBranch 方法
     将日期解析逻辑提取到一个单独的方法中。
     使用静态数组来存储天干地支。*/
-
-    public void addRecord() {
-        String formattedDate = getCurrentFormattedDate();
-        String heavenlyStemEarthlyBranch = convertToHeavenlyStemEarthlyBranch(formattedDate);
-        long js=dbHelper.insertLocation(formattedDate,latitude,longitude,heavenlyStemEarthlyBranch);
-//        System.out.println(js);
-    }
-
-    // 获取当前格式化的日期字符串
-    private String getCurrentFormattedDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss", Locale.CHINA);
-        return sdf.format(new Date());
-    }
-
-    // 天干地支转换函数，根据日期计算
-    public static String convertToHeavenlyStemEarthlyBranch(String date) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss", Locale.CHINA);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(sdf.parse(date));
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH) + 1; // 注意：月份是从 0 开始计数的
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            int hour = calendar.get(Calendar.HOUR_OF_DAY); // 24小时制
-            String ymdh_GZ=Lauar.getLunarGZ(year,month,day,hour);
-            return ymdh_GZ;
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return "未知";
-        }
-    }
-
-    // 解析日期字符串为Calendar对象
-    // 日期操作是java的基础操作
-    private static Calendar parseDate(String date) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss", Locale.CHINA);
-        Date d = sdf.parse(date);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(d);
-        return cal;
-    }
 
 
     /**

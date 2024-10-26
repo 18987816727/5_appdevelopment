@@ -71,6 +71,7 @@
             android:value="ede73462884a2a5e1399ac42c4979989" >
         </meta-data>
         <service android:name="com.amap.api.location.APSService" />
+        <service android:name=".LocationService" />
     </application>
 
 </manifest>
