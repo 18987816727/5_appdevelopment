@@ -63,7 +63,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_GANZHI,ganZhi);
         contentValues.put(COLUMN_ISPUSH,is_push);
         long i=db.insert(TABLE_LOCATIONS,null,contentValues);
-        db.close();
+//        db.close();
         return i;
     }
 
@@ -91,7 +91,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     cursor.getInt(5)
             ));
         }
-        db.close();
+//        db.close();
         return list;
     }
 
@@ -113,7 +113,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     cursor.getInt(5)
             ));
         }
-        db.close();
+//        db.close();
         return list;
     }
 
@@ -141,7 +141,12 @@ public class DBHelper extends SQLiteOpenHelper {
                 Log.e("Update", "No rows updated for ID: " + obj.getId());
             }
         }
-
-        db.close();
+//        db.close();
     }
 }
+
+/*
+* 这里属于单例模式，共享一个连接SQLiteDatabase db = this.getWritableDatabase();如果一个方法将他关闭了，
+* 其它方法就调用不了了
+* */
+

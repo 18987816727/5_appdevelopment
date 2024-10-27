@@ -36,13 +36,17 @@
     <!--允许读设备等信息，用于问题排查-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <!--限制了未加密的http通信，要么允许全部，要么允许部分，要么使用加密配置，这里简单用的允许全部-->
+
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AndroidSnack" >
+        android:theme="@style/Theme.AndroidSnack"
+        tools:targetApi="m">
         <activity
             android:name=".ShowRecord"
             android:exported="true" >

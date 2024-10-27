@@ -35,7 +35,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class LocationService extends Service {
-    private static final int REFRESH_INTERVAL = 30000; // 30秒
+    private static final int REFRESH_INTERVAL = 10000; // 30秒
     private static final String TAG = "LocationService";
 
     private AMapLocationClient locationClient;
@@ -224,6 +224,7 @@ public class LocationService extends Service {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
                         Log.d(TAG, "sever push err");
+                        e.printStackTrace();
                         dbHelper.insertLocation(formattedDate,latitude,longitude,heavenlyStemEarthlyBranch,0);
                     }
 
@@ -235,6 +236,10 @@ public class LocationService extends Service {
                 }
         );
 
+        /*
+        * 通常是因为Android的安全策略阻止了未加密的HTTP（明文）通信。从Android 9（Pie）开始，默认情况下不允许应用程序使用明文协议（如HTTP）与服务器通信，除非明确配置允许。
+        * */
+
         List<TimePositionDataEntity> list = dbHelper.queryNoPushLocations();
 
         asyncHttpRequest.sendPostRequest(
@@ -243,6 +248,7 @@ public class LocationService extends Service {
                 new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                        e.printStackTrace();
                         Log.d(TAG, "sever push err");
                     }
 

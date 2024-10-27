@@ -1,5 +1,6 @@
 package com.example.android_snack;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
@@ -121,4 +122,11 @@ public class StarView extends AppCompatActivity implements View.OnClickListener 
             startActivity(intent_show);
         }
     }
+
+    /*public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // 委托 PermissionHelper 来处理权限请求的结果
+        permissionHelper.handlePermissionsResult(requestCode, permissions, grantResults);
+    }*/
 }

@@ -7,8 +7,8 @@ import org.json.JSONObject;
 import java.util.List;
 
 public class HttpBuild {
-    public static final String POST_DATA_URL="http://test";
-    public static final String POST_DATAS_URL="http://test";
+    public static final String POST_DATA_URL="http://116.62.44.106:8080/data";
+    public static final String POST_DATAS_URL="http://116.62.44.106:8080/datas";
 
     public static String buildRequestBody(
             String formattedDate,
@@ -18,10 +18,10 @@ public class HttpBuild {
     ) throws JSONException {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("formattedDate", formattedDate);
+        jsonObject.put("colDate", formattedDate);
         jsonObject.put("latitude", latitude);
         jsonObject.put("longitude", longitude);
-        jsonObject.put("heavenlyStemEarthlyBranch", heavenlyStemEarthlyBranch);
+        jsonObject.put("ganZhi", heavenlyStemEarthlyBranch);
         return jsonObject.toString();
     }
 
@@ -32,10 +32,10 @@ public class HttpBuild {
         for (TimePositionDataEntity timePositionDataEntity : list) {
             JSONObject jsonObject = new JSONObject();
             try {
-                jsonObject.put("formattedDate", timePositionDataEntity.getDateTime());
+                jsonObject.put("colDate", timePositionDataEntity.getDateTime());
                 jsonObject.put("latitude", timePositionDataEntity.getLatitude());
                 jsonObject.put("longitude", timePositionDataEntity.getLongitude());
-                jsonObject.put("heavenlyStemEarthlyBranch", timePositionDataEntity.getGanZhi());
+                jsonObject.put("ganZhi", timePositionDataEntity.getGanZhi());
                 jsonArray.put(jsonObject);
             } catch (Exception e) {
                 e.printStackTrace();
