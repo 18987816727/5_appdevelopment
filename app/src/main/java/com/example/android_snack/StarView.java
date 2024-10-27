@@ -2,6 +2,7 @@ package com.example.android_snack;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,22 @@ public class StarView extends AppCompatActivity implements View.OnClickListener 
      * The Shared：实例化存储对象
      */
     SharedPre shared;
+    private PermissionHelper permissionHelper;
+
+    // 定义要请求的权限
+    String[] permissions = {
+            android.Manifest.permission.INTERNET,
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.ACCESS_NETWORK_STATE,
+            android.Manifest.permission.ACCESS_WIFI_STATE,
+            android.Manifest.permission.CHANGE_WIFI_STATE,
+            android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+            android.Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS,
+            android.Manifest.permission.WRITE_SETTINGS,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +61,11 @@ public class StarView extends AppCompatActivity implements View.OnClickListener 
         }
         Init();
 
+        permissionHelper = new PermissionHelper(this);
+
+        // 检查并请求权限
+        permissionHelper.checkAndRequestPermissions(permissions);
+
     }
 
     void InitPositionTools() throws InterruptedException {
@@ -55,6 +77,12 @@ public class StarView extends AppCompatActivity implements View.OnClickListener 
         Intent intent = new Intent(this, LocationService.class);
         startService(intent);
     }
+
+    /*
+     * 在Android开发中，启动一个Service和启动一个Activity有明显的不同。下面是两者之间的主要区别
+     * 一个是startService
+     * 一个是startView
+     * */
 
     /**
      * Init：初始化该活动界面信息
@@ -74,18 +102,6 @@ public class StarView extends AppCompatActivity implements View.OnClickListener 
 
 
     }
-
-
-    /*1. RecordManager 构造函数
-    使用常量来定义共享首选项文件名。
-    初始化时直接获取记录数。
-            2. addRecord 方法
-    将日期格式化和天干地支转换逻辑分离，使代码更清晰。
-    减少重复代码。
-            3. convertToHeavenlyStemEarthlyBranch 方法
-    将日期解析逻辑提取到一个单独的方法中。
-    使用静态数组来存储天干地支。*/
-
 
     /**
      * onClick:该界面按钮监听事件

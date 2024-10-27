@@ -204,7 +204,7 @@ public class Lauar {
         //日期
         Lunar1(sDObj); //农历
         int index = (hour + 1) / 2 % 12;
-        return cyclical(getYearCyl()) + "年" + cyclical(getMonCyl()) + "月"+ cyclical(getDayCyl()) + "日"+Gan[index]+"时";
+        return cyclical(getYearCyl()) + "年" + cyclical(getMonCyl()) + "月"+ cyclical(getDayCyl()) + "日"+Zhi[index]+"时";
     }
 
     public static String getLunar(String year, String month, String day) {

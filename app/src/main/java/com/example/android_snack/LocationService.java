@@ -57,12 +57,18 @@ public class LocationService extends Service {
     private double longitude;
     private AsyncHttpRequest asyncHttpRequest;
 
+    /*
+    * 线程这块，ui只能主线程，回调的函数，要注意研究认识相关回调是主线程还是子线程，主线程的会阻塞ui更新，容易卡页面
+    * 反正上面只是一个认识，自己要认清任务和线程与ui理解
+    * ktolin还是有必要研究的哟
+    * handler = new Handler(Looper.getMainLooper());
+    * handler和looper下来要去研究一下，反正线程这块，要去系统研究学习一下
+    * */
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "Service created");
-        // 检查定位权限
-
         // 初始化本地数据库连接
         if (dbHelper==null){
             dbHelper=new DBHelper(this);
@@ -83,7 +89,10 @@ public class LocationService extends Service {
         locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
         // 设置是否返回地址信息
         locationOption.setNeedAddress(true);
-
+        // 设置单一而不是循环定位
+        locationOption.setOnceLocation(true);
+//        设置循环请求间隔
+//        locationOption.setInterval()
         // 设置定位参数
         locationClient.setLocationOption(locationOption);
 
@@ -92,11 +101,12 @@ public class LocationService extends Service {
 
         // 启动定位
         startLocationUpdates();
+        /*这里是个bug
         try {
             addRecord();
         } catch (JSONException e) {
             throw new RuntimeException(e);
-        }
+        }*/
     }
 
     @Override
@@ -136,6 +146,9 @@ public class LocationService extends Service {
                             // 定位成功
                             latitude = amapLocation.getLatitude();
                             longitude = amapLocation.getLongitude();
+                            if (latitude==longitude&&0.0==latitude){
+                             return;
+                            }
                             try {
                                 addRecord();
                             } catch (JSONException e) {
@@ -170,6 +183,23 @@ public class LocationService extends Service {
             handler.post(updateLocationRunnable);
         }
     }
+    /*
+    *   运行一次 locationClient.start() 或 locationClient.startLocation()：
+        如果你仅运行一次 start() 或 startLocation()，定位服务会按照你设置的间隔时间（如30秒）周期性地请求位置更新。
+        这种情况下，定位服务会持续运行，直到你调用 locationClient.stop() 来停止它。
+        多次运行 locationClient.start() 或 locationClient.startLocation()：
+        即使你多次调用这些方法，定位服务依然只会按照最初的配置运行。
+        如果你想更改配置（如更新间隔时间），你需要先停止定位服务，重新设置配置，然后再重新启动它。
+
+        理解一下这个定位就是：
+        locationOption设置了一堆定位参数，locationClient是定位客户端（或者说是执行者），根据定位参数
+        可以具体的执行，他就两个函数，启动定位循环：startLocation()和定位循环监听：setLocationListener
+        怎么理解定位循环，启动后，定位器会根据默认间隔（或者定位参数的setInterval()）来拉去定位，当然也可以
+        .setOnceLocation(true);来设置不是启动定位循环，而是启动一次定位；反正定位数据传回来后（异步），事件
+        监听器中通过AMapLocation amapLocation参数包裹定位信息，需要做的就是解析处理这个
+
+    *
+    * */
 
     private void stopLocationUpdates() {
         if (isRunning) {
@@ -230,6 +260,16 @@ public class LocationService extends Service {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH:mm:ss", Locale.CHINA);
         return sdf.format(new Date());
     }
+
+    /*1. RecordManager 构造函数
+    使用常量来定义共享首选项文件名。
+    初始化时直接获取记录数。
+            2. addRecord 方法
+    将日期格式化和天干地支转换逻辑分离，使代码更清晰。
+    减少重复代码。
+            3. convertToHeavenlyStemEarthlyBranch 方法
+    将日期解析逻辑提取到一个单独的方法中。
+    使用静态数组来存储天干地支。*/
 
     // 天干地支转换函数，根据日期计算
     public static String convertToHeavenlyStemEarthlyBranch(String date) {
